@@ -1,13 +1,14 @@
 #-*- coding:utf-8 -*-
 import re
+import random
 
 from aqt.utils import showInfo, showText
-from .base import MdxService, export, register, with_styles
+from base import MdxService, export, register, with_styles
 
-path = u'/Users/yu/Documents/english study/mdx/LDOCE6双解/L6mp3.mdx'
+path = u'/home/victor/LDOCE6/L6mp3.mdx'
+#path = u'/home/victor/ldoce6/LDOCE6.mdx'
 
-
-@register(u'本地词典-LDOCE6')
+@register(u'Local-LDOCE6')
 class Ldoce6(MdxService):
 
     def __init__(self, dict_path):
@@ -21,14 +22,14 @@ class Ldoce6(MdxService):
     def title(self):
         return self.__register_label__
 
-    @export(u'音标', 1)
+    @export(u'Phonetic Alphabet', 1)
     def fld_phonetic(self):
         html = self.get_html()
         m = re.search(r'<span class="pron">(.*?)</span>', html)
         if m:
-            return m.groups()[0]
+            return '/'+m.groups()[0]+'/'
 
-    @export(u'Bre单词发音', 2)
+    @export(u'British Audio', 2)
     def fld_voicebre(self):
         html = self.get_html()
         m = re.search(r'<span class="brevoice">(.*?)</span brevoice>', html)
@@ -36,7 +37,7 @@ class Ldoce6(MdxService):
             return m.groups()[0]
         return ''
 
-    @export(u'Ame单词发音', 3)
+    @export(u'American Audio', 3)
     def fld_voiceame(self):
         html = self.get_html()
         m = re.search(r'<span class="amevoice">(.*?)</span amevoice>', html)
@@ -44,15 +45,14 @@ class Ldoce6(MdxService):
             return m.groups()[0]
         return ''
 
-    @export(u'sentence', 4)
-    def fld_sentence(self):
+    @export(u'POS', 4)
+    def fld_pos(self):
         html = self.get_html()
-        m = re.search(r'<span class="example">(.*?)</span example>', html)
+        m = re.search(r'<span class="pos">(.*?)</span>', html)
         if m:
-            return re.sub('<img.*?png">', '', m.groups()[0])
-        return ''
+            return m.groups()[0]
 
-    @export(u'def', 5)
+    @export(u'Definition', 5)
     def fld_definate(self):
         html = self.get_html()
         m = re.search(r'<span class="def">(.*?)</span def>', html)
@@ -60,25 +60,43 @@ class Ldoce6(MdxService):
             return m.groups()[0]
         return ''
 
-    @export(u'random_sentence', 6)
-    def fld_random_sentence(self):
+    @export(u'First sentence', 6)
+    def fld_sentence(self):
         html = self.get_html()
-        m = re.findall(r'<span class="example">(.*?)</span example>', html)
+        m = re.search(r'<span class="example">(.*?)</span example>', html)
         if m:
-            number = len(m)
-            index = random.randrange(0, number - 1, 1)
-            return re.sub('<img.*?png">', '', m[index])
+            return re.sub('<img.*?png">', '', m.groups()[0])
         return ''
 
-    @export(u'all sentence', 7)
-    def fld_allsentence(self):
+    @export(u'First 2 sentence audio', 7)
+    def fld_first2sentence_audio(self):
         html = self.get_html()
         m = re.findall(
-            r'(<span class="example">.+?</span example><span class="example_c">.+?</span example_c>)', html)
+            r'(<span class="example">.+?</span example>)', html)
         if m:
-            items = 0
-            my_str = ''
-            for items in range(len(m)):
-                my_str = my_str + m[items]
-            return my_str
+            if len(m) == 1:
+               return re.sub('<img.*?example>','', m[0])
+            else:
+               return re.sub('<img.*?example>','', m[0]) + '<br>' + re.sub('<img.*?example>','', m[1])
         return ''
+
+    @export(u'First 2 sentence', 8)
+    def fld_first2sentence(self):
+        html = self.get_html()
+        m = re.findall(
+            r'(<span class="example">.+?</span example>)', html)
+        if m:
+            if len(m) == 1:
+			   return re.sub('\[.*?png">','1.', m[0])
+            else:
+			   return re.sub('\[.*?png">','1.', m[0])+ '<br>' + re.sub('\[.*?png">','2.', m[1])
+        return ''
+
+
+
+
+
+
+
+
+ 
